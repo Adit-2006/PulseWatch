@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { env } from './config/env.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
 import healthRoutes from './routes/health.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 export const createApp = () => {
   const app = express();
@@ -27,15 +29,17 @@ export const createApp = () => {
     })
   );
 
-  // 2. Request body parsing
+  // 2. Request body parsing & cookies
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser());
 
   // 3. Request Logging
   app.use(requestLogger);
 
   // 4. API Routes
   app.use('/api/health', healthRoutes);
+  app.use('/api/auth', authRoutes);
 
   // 5. Catch-all 404 for undefined routes
   app.use((req, _res, next) => {
