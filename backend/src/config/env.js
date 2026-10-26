@@ -14,6 +14,7 @@ const envSchema = z.object({
     .min(1, 'MONGODB_URI cannot be empty'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  RETENTION_DAYS: z.coerce.number().int().positive().default(30),
 });
 
 const parseResult = envSchema.safeParse(process.env);
