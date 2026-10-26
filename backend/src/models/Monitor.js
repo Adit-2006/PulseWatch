@@ -90,6 +90,9 @@ const monitorSchema = new mongoose.Schema(
 // Compound index: find monitors by user, sorted by creation date
 monitorSchema.index({ userId: 1, createdAt: -1 });
 
+// Compound unique index: reject duplicate URLs for the same user
+monitorSchema.index({ userId: 1, url: 1 }, { unique: true });
+
 // Scheduler index: find monitors due for checking
 monitorSchema.index({ nextCheckAt: 1 });
 

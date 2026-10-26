@@ -15,6 +15,7 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   RETENTION_DAYS: z.coerce.number().int().positive().default(30),
+  MAX_MONITORS_PER_USER: z.coerce.number().int().positive().default(50),
   JWT_SECRET: z
     .string({ required_error: 'JWT_SECRET environment variable is required' })
     .min(32, 'JWT_SECRET must be at least 32 characters for security'),

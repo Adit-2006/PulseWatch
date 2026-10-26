@@ -19,6 +19,7 @@ describe('Environment Configuration Validation', () => {
       expect(result.data.NODE_ENV).toBe('test');
       expect(result.data.MONGODB_URI).toBe('mongodb://localhost:27017/pulsewatch_test');
       expect(result.data.JWT_SECRET).toBe('test-jwt-secret-must-be-at-least-32-characters-long');
+      expect(result.data.MAX_MONITORS_PER_USER).toBe(50);
     }
   });
 
