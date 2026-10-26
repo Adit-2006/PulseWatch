@@ -1,0 +1,32 @@
+{
+  "name": "pulsewatch-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=pulsewatch-backend run dev",
+    "dev:frontend": "npm --workspace=frontend run dev",
+    "dev": "concurrently -n backend,frontend -c blue,magenta \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "build:backend": "npm --workspace=pulsewatch-backend run build",
+    "build:frontend": "npm --workspace=frontend run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "test:backend": "npm --workspace=pulsewatch-backend run test",
+    "test": "npm run test:backend",
+    "lint": "eslint .",
+    "lint:backend": "npm --workspace=pulsewatch-backend run lint",
+    "lint:frontend": "npm --workspace=frontend run lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "concurrently": "^9.1.2",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2"
+  }
+}
