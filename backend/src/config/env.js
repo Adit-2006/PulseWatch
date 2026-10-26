@@ -20,6 +20,10 @@ const envSchema = z.object({
     .string({ required_error: 'JWT_SECRET environment variable is required' })
     .min(32, 'JWT_SECRET must be at least 32 characters for security'),
   JWT_EXPIRES_IN: z.string().default('7d'),
+  START_WORKER_IN_PROCESS: z.coerce.boolean().default(false),
+  WORKER_POLL_INTERVAL_MS: z.coerce.number().int().positive().default(3000),
+  WORKER_CONCURRENCY: z.coerce.number().int().positive().default(5),
+  WORKER_LEASE_DURATION_MS: z.coerce.number().int().positive().default(30000),
 });
 
 const parseResult = envSchema.safeParse(process.env);

@@ -63,10 +63,19 @@ export const disconnectDB = async () => {
 /**
  * Setup graceful shutdown handlers for process termination signals
  * @param {import('http').Server} [server] - Optional HTTP server instance to close
+ * @param {{ stop: () => Promise<void> }} [worker] - Optional worker instance to stop
  */
-export const setupGracefulShutdown = (server) => {
+export const setupGracefulShutdown = (server, worker = null) => {
   const shutdown = async (signal) => {
     console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
+
+    if (worker && typeof worker.stop === 'function') {
+      try {
+        await worker.stop();
+      } catch (err) {
+        console.error('⚠️ Error stopping worker during shutdown:', err);
+      }
+    }
 
     if (server) {
       await new Promise((resolve) => {
