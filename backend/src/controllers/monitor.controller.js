@@ -10,8 +10,14 @@ import {
   queryMonitorsSchema,
   queryIncidentsSchema,
   updateAlertsSchema,
+  queryResponseTimesSchema,
+  togglePublicPageSchema,
   ALLOWED_UPDATE_FIELDS,
 } from '../validators/monitor.validators.js';
+import {
+  getMonitorStats,
+  getMonitorResponseTimes,
+} from '../services/analytics.service.js';
 import { validateUrlAgainstSSRF } from '../utils/ssrf.js';
 import {
   BadRequestError,
@@ -420,6 +426,119 @@ export const updateMonitorAlerts = async (req, res, next) => {
       message: 'Alert settings updated successfully',
     });
   } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/monitors/:id/stats
+ * Return uptime percentage for 24h, 7d, 30d, avg & p95 response time, and total incidents.
+ */
+export const getMonitorStatsController = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const stats = await getMonitorStats(monitor._id);
+
+    res.status(200).json({
+      stats,
+      uptime: stats.uptime,
+      avgResponseTimeMs: stats.avgResponseTimeMs,
+      p95ResponseTimeMs: stats.p95ResponseTimeMs,
+      totalIncidents: stats.totalIncidents,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/monitors/:id/response-times
+ * Return time-bucketed series for chart rendering using MongoDB aggregation pipelines.
+ */
+export const getMonitorResponseTimesController = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const { range } = queryResponseTimesSchema.parse(req.query);
+    const data = await getMonitorResponseTimes(monitor._id, range);
+
+    res.status(200).json({
+      range: data.range,
+      bucketUnit: data.bucketUnit,
+      binSize: data.binSize,
+      series: data.series,
+      responseTimes: data.series,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * POST / PATCH /api/monitors/:id/public
+ * Allow owners to toggle a monitor's public status page on or off.
+ */
+export const togglePublicPageController = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const { isPublic, publicSlug } = togglePublicPageSchema.parse(req.body);
+
+    monitor.isPublic = isPublic;
+
+    if (publicSlug) {
+      monitor.publicSlug = publicSlug;
+    } else if (isPublic && !monitor.publicSlug) {
+      const baseSlug = monitor.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+      const suffix = Math.random().toString(36).substring(2, 7);
+      monitor.publicSlug = `${baseSlug || 'monitor'}-${suffix}`;
+    }
+
+    await monitor.save();
+
+    res.status(200).json({
+      monitor,
+      isPublic: monitor.isPublic,
+      publicSlug: monitor.publicSlug,
+      message: monitor.isPublic
+        ? 'Public status page enabled'
+        : 'Public status page disabled',
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      return next(new ConflictError('A monitor with this public slug already exists'));
+    }
     next(err);
   }
 };

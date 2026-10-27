@@ -8,6 +8,7 @@ import { NotFoundError } from './utils/errors.js';
 import healthRoutes from './routes/health.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import monitorRoutes from './routes/monitor.routes.js';
+import statusRoutes from './routes/status.routes.js';
 
 export const createApp = () => {
   const app = express();
@@ -42,6 +43,7 @@ export const createApp = () => {
   app.use('/api/health', healthRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api/monitors', monitorRoutes);
+  app.use('/api/status', statusRoutes);
 
   // 5. Catch-all 404 for undefined routes
   app.use((req, _res, next) => {

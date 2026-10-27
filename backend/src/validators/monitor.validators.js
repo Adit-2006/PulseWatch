@@ -13,6 +13,7 @@ export const ALLOWED_UPDATE_FIELDS = [
   'expectedStatus',
   'failureThreshold',
   'isPublic',
+  'publicSlug',
   'alerts',
 ];
 
@@ -108,6 +109,14 @@ export const updateMonitorSchema = z
       .max(10, 'Failure threshold must be between 1 and 10')
       .optional(),
     isPublic: z.boolean().optional(),
+    publicSlug: z
+      .string()
+      .trim()
+      .regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens')
+      .min(3, 'Slug must be at least 3 characters')
+      .max(60, 'Slug cannot exceed 60 characters')
+      .nullable()
+      .optional(),
     alerts: z
       .object({
         email: z
@@ -171,4 +180,21 @@ export const queryIncidentsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(10),
   status: z.enum(['OPEN', 'RESOLVED']).optional(),
+});
+
+/** Schema for query parameters on GET /api/monitors/:id/response-times */
+export const queryResponseTimesSchema = z.object({
+  range: z.enum(['1h', '24h', '7d', '30d']).default('24h'),
+});
+
+/** Schema for toggling public status page */
+export const togglePublicPageSchema = z.object({
+  isPublic: z.boolean({ required_error: 'isPublic boolean is required' }),
+  publicSlug: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9-]+$/, 'Slug can only contain lowercase letters, numbers, and hyphens')
+    .min(3, 'Slug must be at least 3 characters')
+    .max(60, 'Slug cannot exceed 60 characters')
+    .optional(),
 });
