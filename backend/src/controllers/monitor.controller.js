@@ -8,6 +8,7 @@ import {
   createMonitorSchema,
   updateMonitorSchema,
   queryMonitorsSchema,
+  queryIncidentsSchema,
   ALLOWED_UPDATE_FIELDS,
 } from '../validators/monitor.validators.js';
 import { validateUrlAgainstSSRF } from '../utils/ssrf.js';
@@ -278,6 +279,50 @@ export const resumeMonitor = async (req, res, next) => {
     await monitor.save();
 
     res.status(200).json({ monitor });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/monitors/:id/incidents
+ * Retrieve paginated incidents for a monitor belonging to the authenticated user.
+ */
+export const getMonitorIncidents = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const { page, limit, status } = queryIncidentsSchema.parse(req.query);
+
+    const filter = { monitorId: monitor._id };
+    if (status) {
+      filter.status = status;
+    }
+
+    const total = await Incident.countDocuments(filter);
+    const incidents = await Incident.find(filter)
+      .sort({ startedAt: -1, createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.status(200).json({
+      incidents,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
   } catch (err) {
     next(err);
   }

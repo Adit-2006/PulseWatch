@@ -2,6 +2,7 @@ import Monitor from '../models/Monitor.js';
 import CheckResult from '../models/CheckResult.js';
 import { executeCheck } from './checker.js';
 import { claimDueMonitors } from './scheduler.js';
+import { processCheckResult } from '../services/incident.service.js';
 import { env } from '../config/env.js';
 
 export class MonitoringWorker {
@@ -83,7 +84,7 @@ export class MonitoringWorker {
       const result = await executeCheck(monitor, { fetchFn: this.fetchFn });
 
       // 2. Store the result in CheckResult collection
-      await CheckResult.create({
+      const checkResult = await CheckResult.create({
         monitorId: monitor._id,
         status: result.status,
         statusCode: result.statusCode,
@@ -92,11 +93,10 @@ export class MonitoringWorker {
         checkedAt: new Date(),
       });
 
-      // 3. Compute consecutive failures
-      const consecutiveFailures =
-        result.status === 'UP' ? 0 : (monitor.consecutiveFailures || 0) + 1;
+      // 3. Process incident lifecycle (atomically updates consecutiveFailures and opens/resolves incidents)
+      await processCheckResult(checkResult);
 
-      // 4. Update monitor: schedule next check, clear lock, update failures
+      // 4. Update monitor: schedule next check, clear lock
       const nextCheckAt = new Date(Date.now() + (monitor.intervalSeconds || 60) * 1000);
 
       await Monitor.updateOne(
@@ -105,7 +105,6 @@ export class MonitoringWorker {
           $set: {
             lockedUntil: null,
             nextCheckAt,
-            consecutiveFailures,
           },
         }
       );

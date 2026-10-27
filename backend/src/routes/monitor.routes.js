@@ -8,6 +8,7 @@ import {
   deleteMonitor,
   pauseMonitor,
   resumeMonitor,
+  getMonitorIncidents,
 } from '../controllers/monitor.controller.js';
 
 const router = Router();
@@ -18,6 +19,7 @@ router.use(authenticate);
 router.post('/', createMonitor);
 router.get('/', getMonitors);
 router.get('/:id', getMonitorById);
+router.get('/:id/incidents', getMonitorIncidents);
 router.patch('/:id', updateMonitor);
 router.delete('/:id', deleteMonitor);
 router.post('/:id/pause', pauseMonitor);

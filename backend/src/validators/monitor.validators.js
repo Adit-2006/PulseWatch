@@ -116,3 +116,10 @@ export const queryMonitorsSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(10),
   search: z.string().trim().optional(),
 });
+
+/** Schema for query parameters on GET /api/monitors/:id/incidents */
+export const queryIncidentsSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+  status: z.enum(['OPEN', 'RESOLVED']).optional(),
+});

@@ -26,6 +26,11 @@ const incidentSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    duration: {
+      type: Number,
+      default: null,
+      min: [0, 'Duration cannot be negative'],
+    },
     failureCount: {
       type: Number,
       default: 1,
@@ -42,6 +47,9 @@ const incidentSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Compound index: query incidents for a monitor in reverse chronological order
+incidentSchema.index({ monitorId: 1, startedAt: -1 });
 
 // Partial unique index: only ONE open incident can exist per monitor.
 // This is the atomic safety net for the incident state machine — it prevents
