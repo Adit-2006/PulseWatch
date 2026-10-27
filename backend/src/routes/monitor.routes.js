@@ -9,6 +9,7 @@ import {
   pauseMonitor,
   resumeMonitor,
   getMonitorIncidents,
+  getMonitorChecks,
   getMonitorAlerts,
   updateMonitorAlerts,
   getMonitorStatsController,
@@ -27,6 +28,7 @@ router.get('/:id', getMonitorById);
 router.get('/:id/stats', getMonitorStatsController);
 router.get('/:id/response-times', getMonitorResponseTimesController);
 router.get('/:id/incidents', getMonitorIncidents);
+router.get('/:id/checks', getMonitorChecks);
 router.get('/:id/alerts', getMonitorAlerts);
 router.patch('/:id/alerts', updateMonitorAlerts);
 router.put('/:id/alerts', updateMonitorAlerts);

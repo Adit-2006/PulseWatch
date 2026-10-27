@@ -1,59 +1,115 @@
+/* "Mist & Ink" Design System Tokens & Base Resets */
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Colors */
+  --bg-page: #F3F5F4;
+  --surface: #FFFFFF;
+  --ink: #1B2A2F;
+  --ink-muted: #5E6B6E;
+  --ink-subtle: #8A979A;
 
-  /* Color Palette - Curated Dark Theme */
-  --bg-base: #090d16;
-  --bg-surface: #0f172a;
-  --bg-surface-elevated: #1e293b;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(16, 185, 129, 0.25);
+  /* Semantic Accents (meaning only) */
+  --accent-operational: #2A8C7B;
+  --accent-chart: #1F6F66;
+  --accent-coral: #C4533F;
+  --accent-amber: #C98A1E;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  /* Hairlines & Outlines */
+  --hairline: #ECEFEE;
+  --hairline-strong: #D5DCDA;
 
-  --accent-emerald: #10b981;
-  --accent-emerald-glow: rgba(16, 185, 129, 0.2);
-  --accent-cyan: #06b6d4;
-  --accent-amber: #f59e0b;
-  --accent-rose: #f43f5e;
-  --accent-indigo: #6366f1;
+  /* Halos */
+  --halo-teal: rgba(42, 140, 123, 0.20);
+  --halo-coral: rgba(196, 83, 63, 0.20);
+  --halo-amber: rgba(201, 138, 30, 0.20);
+  --halo-slate: rgba(94, 107, 110, 0.16);
 
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-full: 9999px;
+  /* Typography */
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05);
-  --shadow-glow: 0 0 25px rgba(16, 185, 129, 0.15);
+  /* Shape & Depth */
+  --radius-card: 22px;
+  --radius-pill: 999px;
+  --radius-tile: 12px;
+  --radius-sm: 8px;
+
+  /* Soft Layered Shadows */
+  --shadow-card: 0 1px 2px rgba(27, 42, 47, 0.04), 0 18px 40px -18px rgba(27, 42, 47, 0.14);
+  --shadow-lift: 0 4px 6px rgba(27, 42, 47, 0.05), 0 24px 44px -16px rgba(27, 42, 47, 0.18);
+  --shadow-tile: 0 1px 2px rgba(27, 42, 47, 0.04), 0 10px 20px -10px rgba(27, 42, 47, 0.08);
+
+  /* Motion */
+  --ease-mist: cubic-bezier(0.2, 0, 0.2, 1);
+  --transition-fast: 180ms ease-out;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.5;
+html {
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
-  background-image:
-    radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 90%, rgba(99, 102, 241, 0.07) 0%, transparent 45%);
+  -moz-osx-font-smoothing: grayscale;
 }
 
-code,
-pre {
-  font-family: var(--font-mono);
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  background-color: var(--bg-page);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Accessible 2px teal focus rings */
+:focus-visible {
+  outline: 2px solid var(--accent-operational);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible) {
+  outline: none;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 15px;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

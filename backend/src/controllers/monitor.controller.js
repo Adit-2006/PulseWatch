@@ -336,6 +336,47 @@ export const getMonitorIncidents = async (req, res, next) => {
 };
 
 /**
+ * GET /api/monitors/:id/checks
+ * Retrieve paginated recent check results for a monitor belonging to the authenticated user.
+ */
+export const getMonitorChecks = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+
+    const total = await CheckResult.countDocuments({ monitorId: monitor._id });
+    const checks = await CheckResult.find({ monitorId: monitor._id })
+      .sort({ checkedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
+
+    res.status(200).json({
+      checks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit) || 1,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * GET /api/monitors/:id/alerts
  * Retrieve alert settings for a monitor.
  */
