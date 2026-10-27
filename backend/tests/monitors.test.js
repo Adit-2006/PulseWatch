@@ -98,18 +98,15 @@ describe('Monitors API - Authentication Guard', () => {
 describe('POST /api/monitors', () => {
   it('should successfully create a monitor and set nextCheckAt', async () => {
     const beforeTime = Date.now();
-    const res = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Production Gateway',
-        url: 'https://example.com/api/v1',
-        method: 'GET',
-        intervalSeconds: 60,
-        timeoutMs: 5000,
-        expectedStatus: 200,
-        failureThreshold: 3,
-      });
+    const res = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Production Gateway',
+      url: 'https://example.com/api/v1',
+      method: 'GET',
+      intervalSeconds: 60,
+      timeoutMs: 5000,
+      expectedStatus: 200,
+      failureThreshold: 3,
+    });
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('monitor');
@@ -168,13 +165,10 @@ describe('POST /api/monitors', () => {
     }
 
     // 6th monitor should fail
-    const overLimit = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Monitor 6 (Over limit)',
-        url: 'https://example.com/service-6',
-      });
+    const overLimit = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Monitor 6 (Over limit)',
+      url: 'https://example.com/service-6',
+    });
 
     expect(overLimit.status).toBe(400);
     expect(overLimit.body.error.code).toBe('MONITOR_LIMIT_REACHED');
@@ -183,86 +177,65 @@ describe('POST /api/monitors', () => {
 
 describe('Zod Validation for Monitor Inputs', () => {
   it('should reject URLs with non-http/https protocol', async () => {
-    const res = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'FTP Monitor',
-        url: 'ftp://example.com/file',
-      });
+    const res = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'FTP Monitor',
+      url: 'ftp://example.com/file',
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
   });
 
   it('should reject intervalSeconds outside 30..3600', async () => {
-    const tooLow = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Too Fast',
-        url: 'https://example.com',
-        intervalSeconds: 15,
-      });
+    const tooLow = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Too Fast',
+      url: 'https://example.com',
+      intervalSeconds: 15,
+    });
     expect(tooLow.status).toBe(400);
     expect(tooLow.body.error.message).toContain('30 and 3600');
 
-    const tooHigh = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Too Slow',
-        url: 'https://example.com',
-        intervalSeconds: 7200,
-      });
+    const tooHigh = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Too Slow',
+      url: 'https://example.com',
+      intervalSeconds: 7200,
+    });
     expect(tooHigh.status).toBe(400);
     expect(tooHigh.body.error.message).toContain('30 and 3600');
   });
 
   it('should reject timeoutMs outside 1000..30000', async () => {
-    const tooLow = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Fast Timeout',
-        url: 'https://example.com',
-        timeoutMs: 500,
-      });
+    const tooLow = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Fast Timeout',
+      url: 'https://example.com',
+      timeoutMs: 500,
+    });
     expect(tooLow.status).toBe(400);
     expect(tooLow.body.error.message).toContain('1000 and 30000');
 
-    const tooHigh = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Slow Timeout',
-        url: 'https://example.com',
-        timeoutMs: 40000,
-      });
+    const tooHigh = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Slow Timeout',
+      url: 'https://example.com',
+      timeoutMs: 40000,
+    });
     expect(tooHigh.status).toBe(400);
     expect(tooHigh.body.error.message).toContain('1000 and 30000');
   });
 
   it('should reject failureThreshold outside 1..10', async () => {
-    const tooLow = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Zero Threshold',
-        url: 'https://example.com',
-        failureThreshold: 0,
-      });
+    const tooLow = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Zero Threshold',
+      url: 'https://example.com',
+      failureThreshold: 0,
+    });
     expect(tooLow.status).toBe(400);
     expect(tooLow.body.error.message).toContain('1 and 10');
 
-    const tooHigh = await request(app)
-      .post('/api/monitors')
-      .set('Cookie', tokenA)
-      .send({
-        name: 'Huge Threshold',
-        url: 'https://example.com',
-        failureThreshold: 15,
-      });
+    const tooHigh = await request(app).post('/api/monitors').set('Cookie', tokenA).send({
+      name: 'Huge Threshold',
+      url: 'https://example.com',
+      failureThreshold: 15,
+    });
     expect(tooHigh.status).toBe(400);
     expect(tooHigh.body.error.message).toContain('1 and 10');
   });
@@ -325,15 +298,21 @@ describe('ID Validation & Ownership Enforcement', () => {
     expect(patchRes.status).toBe(400);
     expect(patchRes.body.error.code).toBe('INVALID_ID');
 
-    const deleteRes = await request(app).delete(`/api/monitors/${malformedId}`).set('Cookie', tokenA);
+    const deleteRes = await request(app)
+      .delete(`/api/monitors/${malformedId}`)
+      .set('Cookie', tokenA);
     expect(deleteRes.status).toBe(400);
     expect(deleteRes.body.error.code).toBe('INVALID_ID');
 
-    const pauseRes = await request(app).post(`/api/monitors/${malformedId}/pause`).set('Cookie', tokenA);
+    const pauseRes = await request(app)
+      .post(`/api/monitors/${malformedId}/pause`)
+      .set('Cookie', tokenA);
     expect(pauseRes.status).toBe(400);
     expect(pauseRes.body.error.code).toBe('INVALID_ID');
 
-    const resumeRes = await request(app).post(`/api/monitors/${malformedId}/resume`).set('Cookie', tokenA);
+    const resumeRes = await request(app)
+      .post(`/api/monitors/${malformedId}/resume`)
+      .set('Cookie', tokenA);
     expect(resumeRes.status).toBe(400);
     expect(resumeRes.body.error.code).toBe('INVALID_ID');
   });
@@ -449,9 +428,7 @@ describe('POST /api/monitors/:id/pause and /resume', () => {
   });
 
   it('should pause an active monitor', async () => {
-    const res = await request(app)
-      .post(`/api/monitors/${monitor._id}/pause`)
-      .set('Cookie', tokenA);
+    const res = await request(app).post(`/api/monitors/${monitor._id}/pause`).set('Cookie', tokenA);
 
     expect(res.status).toBe(200);
     expect(res.body.monitor.isPaused).toBe(true);
@@ -498,9 +475,7 @@ describe('GET /api/monitors - Pagination & Search Filter', () => {
   });
 
   it('should list monitors for authenticated user with pagination metadata', async () => {
-    const res = await request(app)
-      .get('/api/monitors?page=1&limit=2')
-      .set('Cookie', tokenA);
+    const res = await request(app).get('/api/monitors?page=1&limit=2').set('Cookie', tokenA);
 
     expect(res.status).toBe(200);
     expect(res.body.monitors).toHaveLength(2);
@@ -514,27 +489,21 @@ describe('GET /api/monitors - Pagination & Search Filter', () => {
 
   it('should safely escape user regex input when searching', async () => {
     // Search with regex metacharacters: '[API]'
-    const resBracket = await request(app)
-      .get('/api/monitors?search=[API]')
-      .set('Cookie', tokenA);
+    const resBracket = await request(app).get('/api/monitors?search=[API]').set('Cookie', tokenA);
 
     expect(resBracket.status).toBe(200);
     expect(resBracket.body.monitors).toHaveLength(1);
     expect(resBracket.body.monitors[0].name).toBe('Alpha Service [API]');
 
     // Search with '+'
-    const resPlus = await request(app)
-      .get('/api/monitors?search=+ Worker')
-      .set('Cookie', tokenA);
+    const resPlus = await request(app).get('/api/monitors?search=+ Worker').set('Cookie', tokenA);
 
     expect(resPlus.status).toBe(200);
     expect(resPlus.body.monitors).toHaveLength(1);
     expect(resPlus.body.monitors[0].name).toBe('Beta Service + Worker');
 
     // Search by URL substring
-    const resUrl = await request(app)
-      .get('/api/monitors?search=gamma')
-      .set('Cookie', tokenA);
+    const resUrl = await request(app).get('/api/monitors?search=gamma').set('Cookie', tokenA);
 
     expect(resUrl.status).toBe(200);
     expect(resUrl.body.monitors).toHaveLength(1);
@@ -576,9 +545,7 @@ describe('DELETE /api/monitors/:id - Cascade Delete', () => {
     });
 
     // 5. Issue DELETE
-    const res = await request(app)
-      .delete(`/api/monitors/${monitor._id}`)
-      .set('Cookie', tokenA);
+    const res = await request(app).delete(`/api/monitors/${monitor._id}`).set('Cookie', tokenA);
 
     expect(res.status).toBe(200);
     expect(res.body.message).toContain('deleted successfully');

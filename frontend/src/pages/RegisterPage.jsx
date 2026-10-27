@@ -144,11 +144,7 @@ export default function RegisterPage() {
           </div>
 
           <div className="auth-actions-stack">
-            <button
-              type="submit"
-              className="btn btn-primary btn-block"
-              disabled={submitting}
-            >
+            <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
               {submitting ? 'Creating account…' : 'Create account'}
             </button>
           </div>

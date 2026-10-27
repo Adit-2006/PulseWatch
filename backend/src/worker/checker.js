@@ -35,18 +35,12 @@ export function formatErrorMessage(err, timeoutMs) {
   }
 
   // Connection refused
-  if (
-    err.code === 'ECONNREFUSED' ||
-    err.message?.includes('ECONNREFUSED')
-  ) {
+  if (err.code === 'ECONNREFUSED' || err.message?.includes('ECONNREFUSED')) {
     return 'Connection refused by server';
   }
 
   // Connection reset
-  if (
-    err.code === 'ECONNRESET' ||
-    err.message?.includes('ECONNRESET')
-  ) {
+  if (err.code === 'ECONNRESET' || err.message?.includes('ECONNRESET')) {
     return 'Connection reset by peer';
   }
 
@@ -112,9 +106,7 @@ export async function executeCheck(monitor, options = {}) {
 
       // Check if response is a redirect (301, 302, 303, 307, 308)
       const isRedirect =
-        response.status >= 300 &&
-        response.status < 400 &&
-        response.headers.get('location');
+        response.status >= 300 && response.status < 400 && response.headers.get('location');
 
       if (isRedirect) {
         redirectCount++;

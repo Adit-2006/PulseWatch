@@ -72,11 +72,7 @@ export default function StatusBadge({
   const { dotClass, label, aria } = getFormat();
 
   return (
-    <span
-      className={`stationery-status-line ${className}`}
-      role="status"
-      aria-label={aria}
-    >
+    <span className={`stationery-status-line ${className}`} role="status" aria-label={aria}>
       <span className={`status-halo-dot ${dotClass}`} aria-hidden="true" />
       <span className="status-plain-text">{label}</span>
     </span>

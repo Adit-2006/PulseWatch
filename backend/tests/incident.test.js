@@ -239,8 +239,16 @@ describe('Incident Service - Flapping', () => {
 
     for (let cycle = 0; cycle < 5; cycle++) {
       // 2 failures
-      await processCheckResult({ monitorId: monitor._id, status: 'DOWN', errorMessage: 'Unstable err' });
-      await processCheckResult({ monitorId: monitor._id, status: 'DOWN', errorMessage: 'Unstable err' });
+      await processCheckResult({
+        monitorId: monitor._id,
+        status: 'DOWN',
+        errorMessage: 'Unstable err',
+      });
+      await processCheckResult({
+        monitorId: monitor._id,
+        status: 'DOWN',
+        errorMessage: 'Unstable err',
+      });
 
       let mon = await Monitor.findById(monitor._id);
       expect(mon.consecutiveFailures).toBe(2);
@@ -277,7 +285,11 @@ describe('Incident Service - Flapping', () => {
     expect(await Incident.countDocuments({ monitorId: monitor._id, status: 'RESOLVED' })).toBe(1);
 
     // Single DOWN after resolution: increments to 1, no new incident
-    const downRes = await processCheckResult({ monitorId: monitor._id, status: 'DOWN', errorMessage: 'Minor hiccup' });
+    const downRes = await processCheckResult({
+      monitorId: monitor._id,
+      status: 'DOWN',
+      errorMessage: 'Minor hiccup',
+    });
     expect(downRes.action).toBe('INCREMENT_FAILURES');
     expect(downRes.incident).toBeNull();
 

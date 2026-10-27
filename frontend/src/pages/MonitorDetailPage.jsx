@@ -42,50 +42,59 @@ export default function MonitorDetailPage() {
   const [error, setError] = useState(null);
   const [actionPending, setActionPending] = useState(false);
 
-  const fetchMonitor = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    try {
-      const [monData, statsData] = await Promise.all([
-        api.getMonitor(id),
-        api.getMonitorStats(id).catch(() => null),
-      ]);
-      setMonitor(monData.monitor);
-      if (statsData) setStats(statsData);
-      setError(null);
-    } catch (err) {
-      setError(err);
-    } finally {
-      if (isInitial) setLoading(false);
-    }
-  }, [id]);
+  const fetchMonitor = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      try {
+        const [monData, statsData] = await Promise.all([
+          api.getMonitor(id),
+          api.getMonitorStats(id).catch(() => null),
+        ]);
+        setMonitor(monData.monitor);
+        if (statsData) setStats(statsData);
+        setError(null);
+      } catch (err) {
+        setError(err);
+      } finally {
+        if (isInitial) setLoading(false);
+      }
+    },
+    [id]
+  );
 
-  const fetchChart = useCallback(async (range) => {
-    setChartLoading(true);
-    try {
-      const data = await api.getMonitorResponseTimes(id, range);
-      setChartData(data.series || []);
-    } catch (err) {
-      console.warn('Unable to load response times series:', err.message);
-    } finally {
-      setChartLoading(false);
-    }
-  }, [id]);
+  const fetchChart = useCallback(
+    async (range) => {
+      setChartLoading(true);
+      try {
+        const data = await api.getMonitorResponseTimes(id, range);
+        setChartData(data.series || []);
+      } catch (err) {
+        console.warn('Unable to load response times series:', err.message);
+      } finally {
+        setChartLoading(false);
+      }
+    },
+    [id]
+  );
 
-  const fetchChecks = useCallback(async (page = 1) => {
-    setChecksLoading(true);
-    try {
-      const data = await api.getMonitorChecks(id, { page, limit: 12 });
-      setChecks(data.checks || []);
-      setChecksPagination({
-        page: data.pagination?.page || 1,
-        totalPages: data.pagination?.totalPages || 1,
-      });
-    } catch (err) {
-      console.warn('Unable to load checks:', err.message);
-    } finally {
-      setChecksLoading(false);
-    }
-  }, [id]);
+  const fetchChecks = useCallback(
+    async (page = 1) => {
+      setChecksLoading(true);
+      try {
+        const data = await api.getMonitorChecks(id, { page, limit: 12 });
+        setChecks(data.checks || []);
+        setChecksPagination({
+          page: data.pagination?.page || 1,
+          totalPages: data.pagination?.totalPages || 1,
+        });
+      } catch (err) {
+        console.warn('Unable to load checks:', err.message);
+      } finally {
+        setChecksLoading(false);
+      }
+    },
+    [id]
+  );
 
   const fetchIncidents = useCallback(async () => {
     setIncidentsLoading(true);
@@ -114,9 +123,7 @@ export default function MonitorDetailPage() {
             secret: data.alertSettings.webhook?.secret || '',
           },
         });
-        setRecipientsInput(
-          (data.alertSettings.email?.recipients || []).join(', ')
-        );
+        setRecipientsInput((data.alertSettings.email?.recipients || []).join(', '));
       }
     } catch (err) {
       console.warn('Unable to load alert settings:', err.message);
@@ -285,8 +292,8 @@ export default function MonitorDetailPage() {
             {actionPending
               ? 'Updating…'
               : isPaused
-              ? 'Resume health checks'
-              : 'Pause health checks'}
+                ? 'Resume health checks'
+                : 'Pause health checks'}
           </button>
 
           <Link to={`/monitors/${id}/edit`} className="btn btn-secondary">
@@ -395,7 +402,8 @@ export default function MonitorDetailPage() {
               <SkeletonTable rows={5} cols={5} />
             ) : checks.length === 0 ? (
               <p className="tab-empty-text">
-                No checks have been recorded yet. The next probe is scheduled according to your interval.
+                No checks have been recorded yet. The next probe is scheduled according to your
+                interval.
               </p>
             ) : (
               <>
@@ -447,8 +455,7 @@ export default function MonitorDetailPage() {
                       type="button"
                       className="btn btn-secondary btn-sm"
                       disabled={
-                        checksPagination.page >= checksPagination.totalPages ||
-                        checksLoading
+                        checksPagination.page >= checksPagination.totalPages || checksLoading
                       }
                       onClick={() => fetchChecks(checksPagination.page + 1)}
                     >
@@ -494,9 +501,7 @@ export default function MonitorDetailPage() {
                         </td>
                         <td>{new Date(inc.startedAt).toLocaleString()}</td>
                         <td>
-                          {inc.resolvedAt
-                            ? new Date(inc.resolvedAt).toLocaleString()
-                            : 'Ongoing'}
+                          {inc.resolvedAt ? new Date(inc.resolvedAt).toLocaleString() : 'Ongoing'}
                         </td>
                         <td className="font-mono">{formatDuration(inc.duration)}</td>
                         <td className="table-details-col">
@@ -521,7 +526,8 @@ export default function MonitorDetailPage() {
                   <div>
                     <h3 className="channel-tile-title">Email notifications</h3>
                     <p className="channel-tile-desc">
-                      Receive an email when an incident opens or resolves. Alerts are strictly deduplicated per state transition.
+                      Receive an email when an incident opens or resolves. Alerts are strictly
+                      deduplicated per state transition.
                     </p>
                   </div>
                   <label className="switch-control" aria-label="Toggle email notifications">
@@ -562,7 +568,8 @@ export default function MonitorDetailPage() {
                   <div>
                     <h3 className="channel-tile-title">Generic webhook</h3>
                     <p className="channel-tile-desc">
-                      Send an HMAC-signed JSON payload to your custom endpoint upon opening and resolving an incident.
+                      Send an HMAC-signed JSON payload to your custom endpoint upon opening and
+                      resolving an incident.
                     </p>
                   </div>
                   <label className="switch-control" aria-label="Toggle webhook notifications">
@@ -624,11 +631,7 @@ export default function MonitorDetailPage() {
               </div>
 
               <div style={{ marginTop: '24px' }}>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={alertsSaving}
-                >
+                <button type="submit" className="btn btn-primary" disabled={alertsSaving}>
                   {alertsSaving ? 'Saving…' : 'Save alert settings'}
                 </button>
               </div>

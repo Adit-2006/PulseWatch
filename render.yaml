@@ -1,0 +1,63 @@
+services:
+  # ----------------------------------------------------------------------------
+  # PulseWatch API Web Service (with In-Process Monitoring Scheduler)
+  # ----------------------------------------------------------------------------
+  - type: web
+    name: pulsewatch-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build:backend
+    startCommand: npm run start --workspace=pulsewatch-backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # Enable in-process worker so the scheduler runs inside the web container without requiring a second paid instance
+      - key: START_WORKER_IN_PROCESS
+        value: 'true'
+      - key: WORKER_POLL_INTERVAL_MS
+        value: '3000'
+      - key: WORKER_CONCURRENCY
+        value: '5'
+      - key: WORKER_LEASE_DURATION_MS
+        value: '30000'
+      - key: RETENTION_DAYS
+        value: '30'
+      - key: MAX_MONITORS_PER_USER
+        value: '50'
+      - key: ENABLE_DEMO_ROUTES
+        value: 'true'
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: alerts@pulsewatch.dev
+      - key: WEBHOOK_TIMEOUT_MS
+        value: '5000'
+    healthCheckPath: /api/health
+
+  # ----------------------------------------------------------------------------
+  # PulseWatch Frontend Static Site
+  # ----------------------------------------------------------------------------
+  - type: static
+    name: pulsewatch-frontend
+    buildCommand: npm install && npm run build:frontend
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

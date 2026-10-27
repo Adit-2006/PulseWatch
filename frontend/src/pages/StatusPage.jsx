@@ -21,18 +21,21 @@ export default function StatusPage() {
   const [error, setError] = useState(null);
   const [hoveredDay, setHoveredDay] = useState(null);
 
-  const fetchStatus = useCallback(async (isInitial = false) => {
-    if (isInitial) setLoading(true);
-    try {
-      const res = await api.getPublicStatus(slug);
-      setData(res);
-      setError(null);
-    } catch (err) {
-      setError(err);
-    } finally {
-      if (isInitial) setLoading(false);
-    }
-  }, [slug]);
+  const fetchStatus = useCallback(
+    async (isInitial = false) => {
+      if (isInitial) setLoading(true);
+      try {
+        const res = await api.getPublicStatus(slug);
+        setData(res);
+        setError(null);
+      } catch (err) {
+        setError(err);
+      } finally {
+        if (isInitial) setLoading(false);
+      }
+    },
+    [slug]
+  );
 
   useEffect(() => {
     fetchStatus(true);
@@ -105,7 +108,9 @@ export default function StatusPage() {
       <header className="status-page-header">
         <div className="status-brand-line">
           <span className="status-brand-title">PulseWatch</span>
-          <span className="status-brand-divider" aria-hidden="true">&bull;</span>
+          <span className="status-brand-divider" aria-hidden="true">
+            &bull;
+          </span>
           <span className="status-page-kicker">Public status report</span>
         </div>
         <h1 className="status-service-name">{data.name}</h1>
@@ -114,17 +119,15 @@ export default function StatusPage() {
       {/* Large Serif Headline */}
       <section className="status-headline-section" aria-label="Current system status">
         <h2 className="status-serif-headline">
-          {isOperational
-            ? 'All systems operating normally.'
-            : 'Service disruption reported.'}
+          {isOperational ? 'All systems operating normally.' : 'Service disruption reported.'}
         </h2>
 
         <div className="status-headline-meta">
           <StatusBadge status={data.status} />
-          <span className="status-meta-separator" aria-hidden="true">&bull;</span>
-          <span className="status-refresh-note">
-            Refreshed automatically every 30 seconds
+          <span className="status-meta-separator" aria-hidden="true">
+            &bull;
           </span>
+          <span className="status-refresh-note">Refreshed automatically every 30 seconds</span>
         </div>
       </section>
 
@@ -241,7 +244,12 @@ export default function StatusPage() {
                   </p>
                   {inc.resolvedAt && (
                     <span className="incident-resolution-text">
-                      Resolved on {new Date(inc.resolvedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.
+                      Resolved on{' '}
+                      {new Date(inc.resolvedAt).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      .
                     </span>
                   )}
                 </div>

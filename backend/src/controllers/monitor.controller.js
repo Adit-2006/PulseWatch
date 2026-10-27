@@ -14,16 +14,9 @@ import {
   togglePublicPageSchema,
   ALLOWED_UPDATE_FIELDS,
 } from '../validators/monitor.validators.js';
-import {
-  getMonitorStats,
-  getMonitorResponseTimes,
-} from '../services/analytics.service.js';
+import { getMonitorStats, getMonitorResponseTimes } from '../services/analytics.service.js';
 import { validateUrlAgainstSSRF } from '../utils/ssrf.js';
-import {
-  BadRequestError,
-  NotFoundError,
-  ConflictError,
-} from '../utils/errors.js';
+import { BadRequestError, NotFoundError, ConflictError } from '../utils/errors.js';
 
 /**
  * Helper to escape special characters in user input for safe RegExp usage.
@@ -155,7 +148,10 @@ export const updateMonitor = async (req, res, next) => {
 
     const keys = Object.keys(req.body);
     if (keys.length === 0) {
-      throw new BadRequestError('At least one field must be provided for update', 'VALIDATION_ERROR');
+      throw new BadRequestError(
+        'At least one field must be provided for update',
+        'VALIDATION_ERROR'
+      );
     }
 
     // Whitelist updatable fields and reject NoSQL operator injection ($)
@@ -436,7 +432,7 @@ export const updateMonitorAlerts = async (req, res, next) => {
           enabled: validatedAlerts.email.enabled ?? existingAlerts.email?.enabled ?? false,
           recipient:
             validatedAlerts.email.recipient !== undefined
-              ? (validatedAlerts.email.recipient || null)
+              ? validatedAlerts.email.recipient || null
               : (existingAlerts.email?.recipient ?? null),
         }
       : existingAlerts.email || { enabled: false, recipient: null };
@@ -446,11 +442,11 @@ export const updateMonitorAlerts = async (req, res, next) => {
           enabled: validatedAlerts.webhook.enabled ?? existingAlerts.webhook?.enabled ?? false,
           url:
             validatedAlerts.webhook.url !== undefined
-              ? (validatedAlerts.webhook.url || null)
+              ? validatedAlerts.webhook.url || null
               : (existingAlerts.webhook?.url ?? null),
           hmacSecret:
             validatedAlerts.webhook.hmacSecret !== undefined
-              ? (validatedAlerts.webhook.hmacSecret || null)
+              ? validatedAlerts.webhook.hmacSecret || null
               : (existingAlerts.webhook?.hmacSecret ?? null),
         }
       : existingAlerts.webhook || { enabled: false, url: null, hmacSecret: null };
@@ -572,9 +568,7 @@ export const togglePublicPageController = async (req, res, next) => {
       monitor,
       isPublic: monitor.isPublic,
       publicSlug: monitor.publicSlug,
-      message: monitor.isPublic
-        ? 'Public status page enabled'
-        : 'Public status page disabled',
+      message: monitor.isPublic ? 'Public status page enabled' : 'Public status page disabled',
     });
   } catch (err) {
     if (err.code === 11000) {

@@ -45,10 +45,7 @@ export default function Navbar() {
       <nav className="sidebar-nav">
         {isAuthenticated ? (
           <>
-            <Link
-              to="/"
-              className={`sidebar-link ${isCurrent('/') ? 'sidebar-link-active' : ''}`}
-            >
+            <Link to="/" className={`sidebar-link ${isCurrent('/') ? 'sidebar-link-active' : ''}`}>
               Monitors
             </Link>
 

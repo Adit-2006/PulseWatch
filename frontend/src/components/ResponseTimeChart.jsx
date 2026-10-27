@@ -103,10 +103,10 @@ export default function ResponseTimeChart({
     range === '1h'
       ? 'the past hour'
       : range === '24h'
-      ? 'the past 24 hours'
-      : range === '7d'
-      ? 'the past 7 days'
-      : 'the past 30 days'
+        ? 'the past 24 hours'
+        : range === '7d'
+          ? 'the past 7 days'
+          : 'the past 30 days'
   }. Average response latency is ${avgOverall} milliseconds, peaking at ${maxVal} milliseconds.`;
 
   return (
@@ -119,7 +119,9 @@ export default function ResponseTimeChart({
             <span className="serif-stat-label">Average latency</span>
             {points.length > 0 && (
               <>
-                <span className="stat-separator" aria-hidden="true">&bull;</span>
+                <span className="stat-separator" aria-hidden="true">
+                  &bull;
+                </span>
                 <span className="serif-stat-number">{maxVal} ms</span>
                 <span className="serif-stat-label">Peak</span>
               </>
@@ -175,14 +177,7 @@ export default function ResponseTimeChart({
             </defs>
 
             {/* Subtle baseline without gridline clutter */}
-            <line
-              x1="52"
-              y1="204"
-              x2="776"
-              y2="204"
-              stroke="#ECEFEE"
-              strokeWidth="1"
-            />
+            <line x1="52" y1="204" x2="776" y2="204" stroke="#ECEFEE" strokeWidth="1" />
 
             {/* Baseline y-axis label */}
             <text

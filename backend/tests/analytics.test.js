@@ -178,8 +178,18 @@ describe('GET /api/monitors/:id/stats', () => {
 
     // Create 2 incidents for this monitor
     await Incident.create([
-      { monitorId: monitor._id, status: 'RESOLVED', failureCount: 3, startedAt: new Date(now - 86400000) },
-      { monitorId: monitor._id, status: 'RESOLVED', failureCount: 2, startedAt: new Date(now - 172800000) },
+      {
+        monitorId: monitor._id,
+        status: 'RESOLVED',
+        failureCount: 3,
+        startedAt: new Date(now - 86400000),
+      },
+      {
+        monitorId: monitor._id,
+        status: 'RESOLVED',
+        failureCount: 2,
+        startedAt: new Date(now - 172800000),
+      },
     ]);
 
     const res = await request(app)
@@ -386,14 +396,23 @@ describe('Public Status Page & Toggle Management', () => {
       isPublic: true,
       alerts: {
         email: { enabled: true, recipient: 'secret-oncall@pulsewatch.dev' },
-        webhook: { enabled: true, url: 'https://internal-slack.corp/hook', hmacSecret: 'super-secret-key-999' },
+        webhook: {
+          enabled: true,
+          url: 'https://internal-slack.corp/hook',
+          hmacSecret: 'super-secret-key-999',
+        },
       },
     });
 
     // Seed check results
     await CheckResult.create([
       { monitorId: monitor._id, status: 'UP', responseTimeMs: 120, checkedAt: new Date() },
-      { monitorId: monitor._id, status: 'UP', responseTimeMs: 140, checkedAt: new Date(Date.now() - 3600000) },
+      {
+        monitorId: monitor._id,
+        status: 'UP',
+        responseTimeMs: 140,
+        checkedAt: new Date(Date.now() - 3600000),
+      },
     ]);
 
     // Seed an incident

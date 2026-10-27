@@ -14,12 +14,9 @@ export class MonitoringWorker {
    * @param {Function} [options.fetchFn] - Custom fetch function for mocking/testing
    */
   constructor(options = {}) {
-    this.pollIntervalMs =
-      options.pollIntervalMs ?? env.WORKER_POLL_INTERVAL_MS ?? 3000;
-    this.concurrency =
-      options.concurrency ?? env.WORKER_CONCURRENCY ?? 5;
-    this.leaseDurationMs =
-      options.leaseDurationMs ?? env.WORKER_LEASE_DURATION_MS ?? 30000;
+    this.pollIntervalMs = options.pollIntervalMs ?? env.WORKER_POLL_INTERVAL_MS ?? 3000;
+    this.concurrency = options.concurrency ?? env.WORKER_CONCURRENCY ?? 5;
+    this.leaseDurationMs = options.leaseDurationMs ?? env.WORKER_LEASE_DURATION_MS ?? 30000;
     this.fetchFn = options.fetchFn;
 
     this.isRunning = false;
@@ -110,7 +107,10 @@ export class MonitoringWorker {
       );
     } catch (err) {
       // One failing check must NEVER crash the loop
-      console.error(`❌ Check failed for monitor ${monitor._id} (${monitor.name || monitor.url}):`, err.message);
+      console.error(
+        `❌ Check failed for monitor ${monitor._id} (${monitor.name || monitor.url}):`,
+        err.message
+      );
 
       // Always release lock and schedule next check even on unexpected error
       try {
@@ -145,7 +145,9 @@ export class MonitoringWorker {
       this.pollTimeout = null;
     }
 
-    console.log(`⏳ MonitoringWorker stopping... Waiting for ${this.activeChecks.size} active check(s) to finish.`);
+    console.log(
+      `⏳ MonitoringWorker stopping... Waiting for ${this.activeChecks.size} active check(s) to finish.`
+    );
 
     if (this.activeChecks.size > 0) {
       const drainPromise = Promise.allSettled([...this.activeChecks]);

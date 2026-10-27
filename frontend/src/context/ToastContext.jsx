@@ -34,13 +34,15 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast, success, error, info, warning }}>
       {children}
-      <div className="toast-stationery-tray" role="region" aria-label="Notifications" aria-live="polite">
+      <div
+        className="toast-stationery-tray"
+        role="region"
+        aria-label="Notifications"
+        aria-live="polite"
+      >
         {toasts.map((toast) => (
           <div key={toast.id} className={`toast-tile toast-${toast.type}`} role="alert">
-            <span
-              className={`toast-dot-indicator toast-dot-${toast.type}`}
-              aria-hidden="true"
-            />
+            <span className={`toast-dot-indicator toast-dot-${toast.type}`} aria-hidden="true" />
             <div className="toast-copy">{toast.message}</div>
             <button
               type="button"

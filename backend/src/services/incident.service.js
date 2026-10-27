@@ -174,9 +174,14 @@ export async function handleRecovery(monitorId, checkResult = {}, options = {}) 
   }
 
   // Trigger alert asynchronously on incident resolve transition (non-blocking)
-  const alertPromise = dispatchAlerts(monitor, resolvedIncident, 'RESOLVED', options).catch((err) => {
-    console.error(`⚠️ Failed to dispatch RESOLVED alert for monitor ${monitor._id}:`, err.message);
-  });
+  const alertPromise = dispatchAlerts(monitor, resolvedIncident, 'RESOLVED', options).catch(
+    (err) => {
+      console.error(
+        `⚠️ Failed to dispatch RESOLVED alert for monitor ${monitor._id}:`,
+        err.message
+      );
+    }
+  );
 
   return {
     action: 'RESOLVE_INCIDENT',

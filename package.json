@@ -21,7 +21,8 @@
     "lint:frontend": "npm --workspace=frontend run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "seed": "npm --workspace=pulsewatch-backend run seed"
+    "seed": "npm --workspace=pulsewatch-backend run seed",
+    "audit": "npm audit --omit=dev --audit-level=high"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

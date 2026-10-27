@@ -74,7 +74,10 @@
   color: var(--ink-muted);
   text-decoration: none;
   border-radius: var(--radius-tile);
-  transition: color var(--transition-fast), background-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .sidebar-link:hover {
@@ -264,7 +267,12 @@
   box-sizing: border-box;
   cursor: pointer;
   border: none;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
 }
 
 .pill-btn-lg {
@@ -287,11 +295,11 @@
 
 .btn-primary {
   background-color: var(--ink);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background-color: #273A41;
+  background-color: #273a41;
   transform: translateY(-1px);
 }
 
@@ -302,17 +310,17 @@
 }
 
 .btn-secondary:hover {
-  border-color: #BAC6C3;
+  border-color: #bac6c3;
   transform: translateY(-1px);
 }
 
 .btn-coral {
   background-color: var(--accent-coral);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .btn-coral:hover {
-  background-color: #AD4432;
+  background-color: #ad4432;
   transform: translateY(-1px);
 }
 
@@ -361,7 +369,9 @@
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
-  transition: box-shadow var(--transition-fast), background-color var(--transition-fast);
+  transition:
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
 }
 
 .dot-halo-teal {
@@ -447,7 +457,9 @@
   color: var(--ink);
   font-size: 14px;
   box-sizing: border-box;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .search-pill-input::placeholder {
@@ -484,7 +496,9 @@
   padding: 24px;
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .monitor-stationery-card:hover {
@@ -643,12 +657,14 @@
 
 .chart-dot-interactive {
   cursor: pointer;
-  transition: r 120ms ease, fill 120ms ease;
+  transition:
+    r 120ms ease,
+    fill 120ms ease;
 }
 
 .chart-tooltip-stationery {
   background-color: var(--ink);
-  color: #FFFFFF;
+  color: #ffffff;
   padding: 8px 14px;
   border-radius: 10px;
   font-size: 12px;
@@ -658,7 +674,7 @@
 }
 
 .tooltip-time-text {
-  color: #C0C8CA;
+  color: #c0c8ca;
   margin-bottom: 2px;
 }
 
@@ -765,7 +781,9 @@
   min-width: 3px;
   height: 30px;
   border-radius: var(--radius-pill);
-  transition: transform 120ms ease, opacity 120ms ease;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
   cursor: pointer;
 }
 
@@ -781,7 +799,7 @@
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--ink);
-  color: #FFFFFF;
+  color: #ffffff;
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 12px;
@@ -793,7 +811,7 @@
 }
 
 .tooltip-date-text {
-  color: #C0C8CA;
+  color: #c0c8ca;
 }
 
 .uptime-legend-row {
@@ -1054,7 +1072,7 @@
 }
 
 .stationery-table tr:hover td {
-  background-color: #FAFCFB;
+  background-color: #fafcfb;
 }
 
 .font-mono {
@@ -1115,7 +1133,9 @@
   color: var(--ink);
   font-size: 14px;
   box-sizing: border-box;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .field-input-error {
@@ -1191,7 +1211,7 @@
   align-items: flex-start;
 }
 
-.checkbox-tile input[type="checkbox"] {
+.checkbox-tile input[type='checkbox'] {
   margin-top: 3px;
   accent-color: var(--accent-operational);
   width: 18px;
@@ -1411,7 +1431,9 @@
   max-width: 460px;
   width: 100%;
   padding: 32px;
-  box-shadow: 0 1px 2px rgba(27, 42, 47, 0.04), 0 24px 48px -12px rgba(27, 42, 47, 0.22);
+  box-shadow:
+    0 1px 2px rgba(27, 42, 47, 0.04),
+    0 24px 48px -12px rgba(27, 42, 47, 0.22);
 }
 
 .mist-modal-header {
@@ -1459,12 +1481,7 @@
    Skeleton Loader (Slow, Soft Shimmer)
    -------------------------------------------------------------------------- */
 .skeleton-soft-shimmer {
-  background: linear-gradient(
-    90deg,
-    #ECEFEE 25%,
-    #F8FAF9 50%,
-    #ECEFEE 75%
-  );
+  background: linear-gradient(90deg, #ecefee 25%, #f8faf9 50%, #ecefee 75%);
   background-size: 200% 100%;
   animation: mist-shimmer 2.2s infinite ease-in-out;
   border-radius: 8px;

@@ -43,9 +43,11 @@ export const createMonitorSchema = z.object({
     .min(1, 'Monitor name cannot be empty')
     .max(100, 'Monitor name cannot exceed 100 characters'),
   url: urlSchema,
-  method: z.enum(ALLOWED_METHODS, {
-    errorMap: () => ({ message: `Method must be one of: ${ALLOWED_METHODS.join(', ')}` }),
-  }).default('GET'),
+  method: z
+    .enum(ALLOWED_METHODS, {
+      errorMap: () => ({ message: `Method must be one of: ${ALLOWED_METHODS.join(', ')}` }),
+    })
+    .default('GET'),
   intervalSeconds: z.coerce
     .number({ invalid_type_error: 'Interval must be a number' })
     .int('Interval must be an integer')

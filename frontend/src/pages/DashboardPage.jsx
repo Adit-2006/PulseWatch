@@ -103,9 +103,7 @@ export default function DashboardPage() {
     if (!searchQuery.trim()) return monitors;
     const q = searchQuery.toLowerCase();
     return monitors.filter(
-      (m) =>
-        m.name?.toLowerCase().includes(q) ||
-        m.url?.toLowerCase().includes(q)
+      (m) => m.name?.toLowerCase().includes(q) || m.url?.toLowerCase().includes(q)
     );
   }, [monitors, searchQuery]);
 
@@ -149,17 +147,13 @@ export default function DashboardPage() {
             {stats.total === 0
               ? 'Your services are ready to be observed with quiet precision.'
               : stats.down > 0
-              ? `There is currently a service interruption requiring attention.`
-              : 'All monitored endpoints are operating steadily within healthy thresholds.'}
+                ? `There is currently a service interruption requiring attention.`
+                : 'All monitored endpoints are operating steadily within healthy thresholds.'}
           </p>
         </div>
 
         <div className="hero-actions">
-          <Link
-            to="/monitors/new"
-            className="btn btn-primary pill-btn-lg"
-            id="btn-create-monitor"
-          >
+          <Link to="/monitors/new" className="btn btn-primary pill-btn-lg" id="btn-create-monitor">
             Add a monitor
           </Link>
         </div>
@@ -218,7 +212,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="polling-status-text" aria-live="polite">
-          <span className={`status-halo-dot ${refreshing ? 'dot-halo-teal' : 'dot-halo-subtle'}`} aria-hidden="true" />
+          <span
+            className={`status-halo-dot ${refreshing ? 'dot-halo-teal' : 'dot-halo-subtle'}`}
+            aria-hidden="true"
+          />
           <span>{refreshing ? 'Updating metrics…' : 'Checks refreshed every 10 seconds'}</span>
         </div>
       </div>
@@ -268,14 +265,14 @@ export default function DashboardPage() {
                 m.recentLatencies && m.recentLatencies.length >= 3
                   ? m.recentLatencies
                   : m.lastResponseTime
-                  ? [
-                      Math.max(20, Math.round(m.lastResponseTime * 0.92)),
-                      Math.max(20, Math.round(m.lastResponseTime * 1.04)),
-                      Math.max(20, Math.round(m.lastResponseTime * 0.96)),
-                      Math.max(20, Math.round(m.lastResponseTime * 1.02)),
-                      m.lastResponseTime,
-                    ]
-                  : [60, 64, 58, 62, 59];
+                    ? [
+                        Math.max(20, Math.round(m.lastResponseTime * 0.92)),
+                        Math.max(20, Math.round(m.lastResponseTime * 1.04)),
+                        Math.max(20, Math.round(m.lastResponseTime * 0.96)),
+                        Math.max(20, Math.round(m.lastResponseTime * 1.02)),
+                        m.lastResponseTime,
+                      ]
+                    : [60, 64, 58, 62, 59];
 
               return (
                 <article
@@ -404,8 +401,8 @@ export default function DashboardPage() {
           Are you sure you wish to delete <strong>{deleteTarget?.name}</strong>?
         </p>
         <p className="modal-guidance-text">
-          Historical latency metrics, incidents, and public status observations associated
-          with this endpoint will be permanently erased.
+          Historical latency metrics, incidents, and public status observations associated with this
+          endpoint will be permanently erased.
         </p>
       </Modal>
     </div>

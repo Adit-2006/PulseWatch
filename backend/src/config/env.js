@@ -33,6 +33,7 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   WEBHOOK_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
+  ENABLE_DEMO_ROUTES: z.coerce.boolean().default(false),
 });
 
 const parseResult = envSchema.safeParse(process.env);

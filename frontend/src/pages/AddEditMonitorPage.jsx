@@ -200,9 +200,7 @@ export default function AddEditMonitorPage() {
           <Link to={isEditMode ? `/monitors/${id}` : '/'} className="editorial-back-link">
             &larr; Back to {isEditMode ? 'monitor details' : 'overview'}
           </Link>
-          <h1 className="page-display-title">
-            {isEditMode ? 'Edit monitor.' : 'New monitor.'}
-          </h1>
+          <h1 className="page-display-title">{isEditMode ? 'Edit monitor.' : 'New monitor.'}</h1>
           <p className="page-display-subtitle">
             Configure automated health checks, threshold rules, and public availability.
           </p>
@@ -410,23 +408,22 @@ export default function AddEditMonitorPage() {
               <div className="checkbox-content">
                 <span className="checkbox-heading">Publish a public status page</span>
                 <span className="checkbox-subtext">
-                  Creates an open, read-only status page accessible at /status/:slug. No private alert settings or internal identifiers are ever exposed.
+                  Creates an open, read-only status page accessible at /status/:slug. No private
+                  alert settings or internal identifiers are ever exposed.
                 </span>
               </div>
             </label>
 
             {formData.isPublic && (
               <div className="form-field" style={{ marginTop: '20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                >
                   <label htmlFor="publicSlug" className="field-label">
                     Page slug
                   </label>
                   {formData.name && (
-                    <button
-                      type="button"
-                      className="text-action-link"
-                      onClick={handleGenerateSlug}
-                    >
+                    <button type="button" className="text-action-link" onClick={handleGenerateSlug}>
                       Fill from name
                     </button>
                   )}
@@ -462,22 +459,11 @@ export default function AddEditMonitorPage() {
 
           {/* Actions */}
           <div className="form-actions-row">
-            <Link
-              to={isEditMode ? `/monitors/${id}` : '/'}
-              className="btn btn-secondary"
-            >
+            <Link to={isEditMode ? `/monitors/${id}` : '/'} className="btn btn-secondary">
               Cancel
             </Link>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={submitting}
-            >
-              {submitting
-                ? 'Saving…'
-                : isEditMode
-                ? 'Save changes'
-                : 'Create monitor'}
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create monitor'}
             </button>
           </div>
         </form>

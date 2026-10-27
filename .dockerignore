@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+.git
+.github
+.env
+*.env
+*.log
+.DS_Store
+coverage
+.vitest
+frontend/dist

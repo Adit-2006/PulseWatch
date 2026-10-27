@@ -1,26 +1,26 @@
 /* "Mist & Ink" Design System Tokens & Base Resets */
 :root {
   /* Colors */
-  --bg-page: #F3F5F4;
-  --surface: #FFFFFF;
-  --ink: #1B2A2F;
-  --ink-muted: #5E6B6E;
-  --ink-subtle: #8A979A;
+  --bg-page: #f3f5f4;
+  --surface: #ffffff;
+  --ink: #1b2a2f;
+  --ink-muted: #5e6b6e;
+  --ink-subtle: #8a979a;
 
   /* Semantic Accents (meaning only) */
-  --accent-operational: #2A8C7B;
-  --accent-chart: #1F6F66;
-  --accent-coral: #C4533F;
-  --accent-amber: #C98A1E;
+  --accent-operational: #2a8c7b;
+  --accent-chart: #1f6f66;
+  --accent-coral: #c4533f;
+  --accent-amber: #c98a1e;
 
   /* Hairlines & Outlines */
-  --hairline: #ECEFEE;
-  --hairline-strong: #D5DCDA;
+  --hairline: #ecefee;
+  --hairline-strong: #d5dcda;
 
   /* Halos */
-  --halo-teal: rgba(42, 140, 123, 0.20);
-  --halo-coral: rgba(196, 83, 63, 0.20);
-  --halo-amber: rgba(201, 138, 30, 0.20);
+  --halo-teal: rgba(42, 140, 123, 0.2);
+  --halo-coral: rgba(196, 83, 63, 0.2);
+  --halo-amber: rgba(201, 138, 30, 0.2);
   --halo-slate: rgba(94, 107, 110, 0.16);
 
   /* Typography */

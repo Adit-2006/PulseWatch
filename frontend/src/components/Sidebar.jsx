@@ -37,18 +37,14 @@ export default function Sidebar() {
           <NavLink
             to="/"
             end
-            className={({ isActive }) =>
-              `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`
-            }
+            className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
           >
             Monitors
           </NavLink>
 
           <NavLink
             to="/monitors/new"
-            className={({ isActive }) =>
-              `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`
-            }
+            className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
           >
             New monitor
           </NavLink>
@@ -63,11 +59,7 @@ export default function Sidebar() {
             </span>
           </div>
 
-          <button
-            type="button"
-            className="sidebar-signout-btn"
-            onClick={handleLogout}
-          >
+          <button type="button" className="sidebar-signout-btn" onClick={handleLogout}>
             Sign out
           </button>
         </div>

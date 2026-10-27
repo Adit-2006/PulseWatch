@@ -18,7 +18,7 @@ export function isPrivateIp(ip) {
     if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) {
       return true;
     }
-    const [a, b, c, d] = parts;
+    const [a, b, c] = parts;
 
     // 0.0.0.0/8 (Current network)
     if (a === 0) return true;
@@ -70,7 +70,12 @@ export function isPrivateIp(ip) {
     const lower = ip.toLowerCase();
 
     // ::1 (Loopback) or :: (Unspecified)
-    if (lower === '::1' || lower === '::' || lower === '0:0:0:0:0:0:0:1' || lower === '0:0:0:0:0:0:0:0') {
+    if (
+      lower === '::1' ||
+      lower === '::' ||
+      lower === '0:0:0:0:0:0:0:1' ||
+      lower === '0:0:0:0:0:0:0:0'
+    ) {
       return true;
     }
 
@@ -174,7 +179,11 @@ export async function validateUrlAgainstSSRF(urlString) {
     // In test environment: if offline, allow mock public domains without failing tests
     if (env.NODE_ENV === 'test' && (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN')) {
       const mockPublicDomains = ['example.com', 'pulsewatch.dev', 'api.github.com'];
-      if (mockPublicDomains.includes(lowerHostname) || lowerHostname.endsWith('.test') || lowerHostname.endsWith('.example')) {
+      if (
+        mockPublicDomains.includes(lowerHostname) ||
+        lowerHostname.endsWith('.test') ||
+        lowerHostname.endsWith('.example')
+      ) {
         return true;
       }
     }

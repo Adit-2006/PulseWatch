@@ -63,9 +63,7 @@ export default function LoginPage() {
         <header className="auth-header">
           <span className="auth-wordmark">PulseWatch</span>
           <h1 className="auth-title">Welcome back.</h1>
-          <p className="auth-subtitle">
-            Sign in to review and manage your monitored services.
-          </p>
+          <p className="auth-subtitle">Sign in to review and manage your monitored services.</p>
         </header>
 
         {errors.form && (
@@ -122,19 +120,11 @@ export default function LoginPage() {
           </div>
 
           <div className="auth-actions-stack">
-            <button
-              type="submit"
-              className="btn btn-primary btn-block"
-              disabled={submitting}
-            >
+            <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
               {submitting ? 'Signing in…' : 'Sign in'}
             </button>
 
-            <button
-              type="button"
-              className="btn btn-secondary btn-block"
-              onClick={handleFillDemo}
-            >
+            <button type="button" className="btn btn-secondary btn-block" onClick={handleFillDemo}>
               Fill demo credentials
             </button>
           </div>

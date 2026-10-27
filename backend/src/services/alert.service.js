@@ -44,8 +44,7 @@ export async function deliverAlertWithRetry(
   options = {}
 ) {
   const maxAttempts = options.maxAttempts ?? 3;
-  const initialBackoffMs =
-    options.initialBackoffMs ?? (process.env.NODE_ENV === 'test' ? 10 : 500);
+  const initialBackoffMs = options.initialBackoffMs ?? (process.env.NODE_ENV === 'test' ? 10 : 500);
 
   // 1. Database-level deduplication:
   // Check if an alert already exists for this (incidentId, type, channel)

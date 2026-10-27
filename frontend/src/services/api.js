@@ -36,7 +36,12 @@ async function request(endpoint, options = {}) {
     const response = await fetch(url, config);
 
     // 401 Unauthorized handling on protected routes
-    if (response.status === 401 && !endpoint.includes('/api/auth/login') && !endpoint.includes('/api/auth/register') && !endpoint.includes('/api/auth/me')) {
+    if (
+      response.status === 401 &&
+      !endpoint.includes('/api/auth/login') &&
+      !endpoint.includes('/api/auth/register') &&
+      !endpoint.includes('/api/auth/me')
+    ) {
       // Dispatch custom event so AuthContext can handle redirect cleanly
       window.dispatchEvent(new CustomEvent('pulsewatch:unauthorized'));
     }
@@ -49,9 +54,7 @@ async function request(endpoint, options = {}) {
 
     if (!response.ok) {
       const errorMessage =
-        data?.error?.message ||
-        data?.message ||
-        `Request failed with HTTP ${response.status}`;
+        data?.error?.message || data?.message || `Request failed with HTTP ${response.status}`;
       const errorCode = data?.error?.code || data?.code || 'API_ERROR';
       const details = data?.error?.details || data?.details || null;
       throw new ApiError(errorMessage, response.status, errorCode, details);

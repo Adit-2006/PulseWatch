@@ -21,12 +21,23 @@ export function SkeletonLine({ width = '100%', height = '16px', className = '', 
 export function SkeletonCard() {
   return (
     <div className="card skeleton-card-stationery" aria-hidden="true">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '16px',
+        }}
+      >
         <SkeletonLine width="55%" height="22px" />
         <SkeletonLine width="25%" height="18px" />
       </div>
       <SkeletonLine width="75%" height="14px" style={{ marginBottom: '20px' }} />
-      <SkeletonLine width="100%" height="48px" style={{ marginBottom: '20px', borderRadius: '12px' }} />
+      <SkeletonLine
+        width="100%"
+        height="48px"
+        style={{ marginBottom: '20px', borderRadius: '12px' }}
+      />
       <div style={{ display: 'flex', gap: '20px', marginTop: '16px' }}>
         <SkeletonLine width="45%" height="32px" />
         <SkeletonLine width="45%" height="32px" />

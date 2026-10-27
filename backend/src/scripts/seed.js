@@ -229,7 +229,9 @@ async function seed() {
     const monitor = await Monitor.create({
       ...template,
       userId: user._id,
-      publicSlug: template.isPublic ? `${template.name.toLowerCase().replace(/\s+/g, '-')}-${randomSlug()}` : undefined,
+      publicSlug: template.isPublic
+        ? `${template.name.toLowerCase().replace(/\s+/g, '-')}-${randomSlug()}`
+        : undefined,
       consecutiveFailures: 0,
       nextCheckAt: offsetDate(now, randInt(5000, 30000)),
     });
@@ -248,7 +250,9 @@ async function seed() {
       totalChecks += results.length;
     }
   }
-  console.log(`✅ Inserted ${totalChecks.toLocaleString()} check results across ${monitors.length} monitors.`);
+  console.log(
+    `✅ Inserted ${totalChecks.toLocaleString()} check results across ${monitors.length} monitors.`
+  );
 
   // ------ Generate a past incident on the first monitor ------
   console.log('\n🚨 Creating past incident...');

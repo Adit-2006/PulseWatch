@@ -10,11 +10,7 @@ process.env.JWT_EXPIRES_IN = '1h';
 import User from '../src/models/User.js';
 import Monitor from '../src/models/Monitor.js';
 import CheckResult from '../src/models/CheckResult.js';
-import {
-  claimDueMonitor,
-  claimDueMonitors,
-  releaseMonitorLock,
-} from '../src/worker/scheduler.js';
+import { claimDueMonitor, claimDueMonitors, releaseMonitorLock } from '../src/worker/scheduler.js';
 import { executeCheck } from '../src/worker/checker.js';
 import { MonitoringWorker } from '../src/worker/engine.js';
 
@@ -303,10 +299,7 @@ describe('HTTP Check Execution & UP/DOWN Classification (Mocked HTTP)', () => {
       throw err;
     };
 
-    const result = await executeCheck(
-      { url: 'http://example.com' },
-      { fetchFn: mockRefusedFetch }
-    );
+    const result = await executeCheck({ url: 'http://example.com' }, { fetchFn: mockRefusedFetch });
 
     expect(result.status).toBe('DOWN');
     expect(result.statusCode).toBeNull();
@@ -320,10 +313,7 @@ describe('HTTP Check Execution & UP/DOWN Classification (Mocked HTTP)', () => {
       throw err;
     };
 
-    const result = await executeCheck(
-      { url: 'https://example.com' },
-      { fetchFn: mockResetFetch }
-    );
+    const result = await executeCheck({ url: 'https://example.com' }, { fetchFn: mockResetFetch });
 
     expect(result.status).toBe('DOWN');
     expect(result.errorMessage).toBe('Connection reset by peer');
@@ -467,7 +457,7 @@ describe('MonitoringWorker Engine Lifecycle', () => {
       return { status: 200, headers: new Headers() };
     };
 
-    const monitor = await Monitor.create({
+    await Monitor.create({
       name: 'Slow Check Monitor',
       url: 'https://example.com/slow',
       userId: testUser._id,

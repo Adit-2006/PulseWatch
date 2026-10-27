@@ -99,22 +99,28 @@ describe('Alert Service - Incident State Transition Triggering', () => {
     };
 
     // Check 1: DOWN -> consecutiveFailures = 1 (threshold 2 not reached) -> NO alert
-    const r1 = await processCheckResult({
-      monitorId: monitor._id,
-      status: 'DOWN',
-      errorMessage: 'Service down 1',
-    }, alertOptions);
+    const r1 = await processCheckResult(
+      {
+        monitorId: monitor._id,
+        status: 'DOWN',
+        errorMessage: 'Service down 1',
+      },
+      alertOptions
+    );
     expect(r1.action).toBe('INCREMENT_FAILURES');
     expect(mockEmailSender).not.toHaveBeenCalled();
     expect(mockWebhookSender).not.toHaveBeenCalled();
     expect(await AlertLog.countDocuments({})).toBe(0);
 
     // Check 2: DOWN -> reaches threshold 2 -> Incident OPENS! -> Alerts triggered!
-    const r2 = await processCheckResult({
-      monitorId: monitor._id,
-      status: 'DOWN',
-      errorMessage: 'Service down 2',
-    }, alertOptions);
+    const r2 = await processCheckResult(
+      {
+        monitorId: monitor._id,
+        status: 'DOWN',
+        errorMessage: 'Service down 2',
+      },
+      alertOptions
+    );
     expect(r2.action).toBe('OPEN_INCIDENT');
     if (r2.alertPromise) await r2.alertPromise;
 
@@ -129,11 +135,14 @@ describe('Alert Service - Incident State Transition Triggering', () => {
     // Checks 3 to 10: 8 consecutive repeated failures while incident is OPEN
     // Must NEVER trigger any new alerts!
     for (let i = 3; i <= 10; i++) {
-      const rRep = await processCheckResult({
-        monitorId: monitor._id,
-        status: 'DOWN',
-        errorMessage: `Service down ${i}`,
-      }, alertOptions);
+      const rRep = await processCheckResult(
+        {
+          monitorId: monitor._id,
+          status: 'DOWN',
+          errorMessage: `Service down ${i}`,
+        },
+        alertOptions
+      );
       expect(rRep.action).toBe('UPDATE_OPEN_INCIDENT');
       if (rRep.alertPromise) await rRep.alertPromise;
     }
@@ -166,21 +175,27 @@ describe('Alert Service - Incident State Transition Triggering', () => {
     };
 
     // Open incident
-    const rOpen = await processCheckResult({
-      monitorId: monitor._id,
-      status: 'DOWN',
-      errorMessage: 'Fatal crash',
-    }, alertOptions);
+    const rOpen = await processCheckResult(
+      {
+        monitorId: monitor._id,
+        status: 'DOWN',
+        errorMessage: 'Fatal crash',
+      },
+      alertOptions
+    );
     if (rOpen.alertPromise) await rOpen.alertPromise;
 
     expect(mockEmailSender).toHaveBeenCalledTimes(1);
     expect(mockWebhookSender).toHaveBeenCalledTimes(1);
 
     // Recovery check: UP -> Incident resolves -> RESOLVED alert triggered
-    const rResolve = await processCheckResult({
-      monitorId: monitor._id,
-      status: 'UP',
-    }, alertOptions);
+    const rResolve = await processCheckResult(
+      {
+        monitorId: monitor._id,
+        status: 'UP',
+      },
+      alertOptions
+    );
     expect(rResolve.action).toBe('RESOLVE_INCIDENT');
     if (rResolve.alertPromise) await rResolve.alertPromise;
 
@@ -193,10 +208,13 @@ describe('Alert Service - Incident State Transition Triggering', () => {
 
     // Subsequent UP checks: already resolved -> NO alerts
     for (let i = 0; i < 5; i++) {
-      const rUp = await processCheckResult({
-        monitorId: monitor._id,
-        status: 'UP',
-      }, alertOptions);
+      const rUp = await processCheckResult(
+        {
+          monitorId: monitor._id,
+          status: 'UP',
+        },
+        alertOptions
+      );
       expect(rUp.action).toBe('RESET_COUNTER');
       if (rUp.alertPromise) await rUp.alertPromise;
     }
@@ -237,18 +255,32 @@ describe('Alert Service - Database-Level Deduplication', () => {
 
     // Run 5 simultaneous delivery attempts for the same incident, type, and channel
     const attempts = await Promise.all([
-      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, { initialBackoffMs: 5 }),
-      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, { initialBackoffMs: 5 }),
-      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, { initialBackoffMs: 5 }),
-      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, { initialBackoffMs: 5 }),
-      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, { initialBackoffMs: 5 }),
+      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, {
+        initialBackoffMs: 5,
+      }),
+      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, {
+        initialBackoffMs: 5,
+      }),
+      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, {
+        initialBackoffMs: 5,
+      }),
+      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, {
+        initialBackoffMs: 5,
+      }),
+      deliverAlertWithRetry('email', monitor, incident, 'OPENED', mockSend, {
+        initialBackoffMs: 5,
+      }),
     ]);
 
     // Only one delivery actually sent the email
     expect(sendCount).toBe(1);
 
     // Exactly one AlertLog document exists in the collection
-    const logs = await AlertLog.find({ incidentId: incident._id, channel: 'email', type: 'OPENED' });
+    const logs = await AlertLog.find({
+      incidentId: incident._id,
+      channel: 'email',
+      type: 'OPENED',
+    });
     expect(logs).toHaveLength(1);
     expect(logs[0].status).toBe('SENT');
 
