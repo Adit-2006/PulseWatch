@@ -81,6 +81,35 @@ const monitorSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    alerts: {
+      email: {
+        enabled: {
+          type: Boolean,
+          default: false,
+        },
+        recipient: {
+          type: String,
+          trim: true,
+          default: null,
+        },
+      },
+      webhook: {
+        enabled: {
+          type: Boolean,
+          default: false,
+        },
+        url: {
+          type: String,
+          trim: true,
+          default: null,
+        },
+        hmacSecret: {
+          type: String,
+          trim: true,
+          default: null,
+        },
+      },
+    },
   },
   {
     timestamps: true,

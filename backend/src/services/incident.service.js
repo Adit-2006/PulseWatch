@@ -1,5 +1,6 @@
 import Monitor from '../models/Monitor.js';
 import Incident from '../models/Incident.js';
+import { dispatchAlerts } from './alert.service.js';
 
 /**
  * Handle a DOWN check result:
@@ -7,12 +8,14 @@ import Incident from '../models/Incident.js';
  * - When consecutiveFailures reaches failureThreshold and no OPEN incident exists, creates one.
  * - If an OPEN incident already exists, updates its failure count and latest error message.
  * - Relies on the partial unique index and catches code 11000 gracefully to guarantee idempotency.
+ * - Triggers alerts only on incident state transitions (when an incident opens).
  *
  * @param {string|import('mongoose').Types.ObjectId} monitorId
  * @param {Object} checkResult - Check result data ({ status, errorMessage, checkedAt, ... })
+ * @param {Object} [options] - Options passed to alert dispatcher (e.g. mock senders)
  * @returns {Promise<Object>}
  */
-export async function handleFailure(monitorId, checkResult = {}) {
+export async function handleFailure(monitorId, checkResult = {}, options = {}) {
   // 1. Atomically increment consecutiveFailures with $inc
   const monitor = await Monitor.findByIdAndUpdate(
     monitorId,
@@ -74,10 +77,16 @@ export async function handleFailure(monitorId, checkResult = {}) {
       lastErrorMessage: checkResult.errorMessage || null,
     });
 
+    // Trigger alert asynchronously on incident open transition (non-blocking)
+    const alertPromise = dispatchAlerts(monitor, newIncident, 'OPENED', options).catch((err) => {
+      console.error(`⚠️ Failed to dispatch OPENED alert for monitor ${monitor._id}:`, err.message);
+    });
+
     return {
       action: 'OPEN_INCIDENT',
       consecutiveFailures: monitor.consecutiveFailures,
       incident: newIncident,
+      alertPromise,
     };
   } catch (err) {
     // 5. Handle duplicate key error (11000) gracefully
@@ -102,12 +111,14 @@ export async function handleFailure(monitorId, checkResult = {}) {
  * - Atomically resets consecutiveFailures to 0.
  * - If an OPEN incident exists, resolves it atomically using findOneAndUpdate with resolvedAt and duration.
  * - If no OPEN incident exists (e.g. single success before threshold), only resets counter.
+ * - Triggers alerts only on incident state transitions (when an incident resolves).
  *
  * @param {string|import('mongoose').Types.ObjectId} monitorId
  * @param {Object} checkResult - Check result data ({ status, checkedAt, ... })
+ * @param {Object} [options] - Options passed to alert dispatcher (e.g. mock senders)
  * @returns {Promise<Object>}
  */
-export async function handleRecovery(monitorId, checkResult = {}) {
+export async function handleRecovery(monitorId, checkResult = {}, options = {}) {
   // 1. Atomically reset consecutiveFailures to 0
   const monitor = await Monitor.findByIdAndUpdate(
     monitorId,
@@ -162,34 +173,44 @@ export async function handleRecovery(monitorId, checkResult = {}) {
     };
   }
 
+  // Trigger alert asynchronously on incident resolve transition (non-blocking)
+  const alertPromise = dispatchAlerts(monitor, resolvedIncident, 'RESOLVED', options).catch((err) => {
+    console.error(`⚠️ Failed to dispatch RESOLVED alert for monitor ${monitor._id}:`, err.message);
+  });
+
   return {
     action: 'RESOLVE_INCIDENT',
     consecutiveFailures: 0,
     incident: resolvedIncident,
+    alertPromise,
   };
 }
 
 /**
  * Main entrypoint for processing incident lifecycle after a CheckResult.
  * Accepts either:
- *   - (checkResult)
- *   - (monitorId, checkResult)
- *   - (monitor, checkResult)
+ *   - (checkResult, options)
+ *   - (monitorId, checkResult, options)
+ *   - (monitor, checkResult, options)
  *
  * @param {Object|string|import('mongoose').Types.ObjectId} arg1
  * @param {Object} [arg2]
+ * @param {Object} [maybeOptions]
  * @returns {Promise<Object>}
  */
-export async function processCheckResult(arg1, arg2) {
+export async function processCheckResult(arg1, arg2, maybeOptions) {
   let monitorId;
   let checkResult;
+  let options;
 
-  if (arg2 !== undefined) {
+  if (arg2 !== undefined && typeof arg2 === 'object' && arg2.status) {
     monitorId = arg1?._id || arg1;
     checkResult = arg2;
+    options = maybeOptions || {};
   } else {
     checkResult = arg1;
     monitorId = checkResult?.monitorId?._id || checkResult?.monitorId;
+    options = arg2 || {};
   }
 
   if (!monitorId) {
@@ -197,11 +218,11 @@ export async function processCheckResult(arg1, arg2) {
   }
 
   if (checkResult?.status === 'DOWN') {
-    return handleFailure(monitorId, checkResult);
+    return handleFailure(monitorId, checkResult, options);
   }
 
   if (checkResult?.status === 'UP') {
-    return handleRecovery(monitorId, checkResult);
+    return handleRecovery(monitorId, checkResult, options);
   }
 
   throw new Error(`Unsupported check status: '${checkResult?.status}'`);

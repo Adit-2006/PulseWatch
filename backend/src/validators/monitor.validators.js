@@ -13,6 +13,7 @@ export const ALLOWED_UPDATE_FIELDS = [
   'expectedStatus',
   'failureThreshold',
   'isPublic',
+  'alerts',
 ];
 
 /** Base URL schema: must be http or https */
@@ -107,6 +108,54 @@ export const updateMonitorSchema = z
       .max(10, 'Failure threshold must be between 1 and 10')
       .optional(),
     isPublic: z.boolean().optional(),
+    alerts: z
+      .object({
+        email: z
+          .object({
+            enabled: z.boolean().default(false),
+            recipient: z
+              .string()
+              .trim()
+              .email('Invalid email address')
+              .or(z.literal(''))
+              .nullable()
+              .optional(),
+          })
+          .optional(),
+        webhook: z
+          .object({
+            enabled: z.boolean().default(false),
+            url: urlSchema.or(z.literal('')).nullable().optional(),
+            hmacSecret: z.string().trim().nullable().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+  })
+  .strict();
+
+/** Schema for configuring alert channels on a monitor */
+export const updateAlertsSchema = z
+  .object({
+    email: z
+      .object({
+        enabled: z.boolean().default(false),
+        recipient: z
+          .string()
+          .trim()
+          .email('Invalid email address')
+          .or(z.literal(''))
+          .nullable()
+          .optional(),
+      })
+      .optional(),
+    webhook: z
+      .object({
+        enabled: z.boolean().default(false),
+        url: urlSchema.or(z.literal('')).nullable().optional(),
+        hmacSecret: z.string().trim().nullable().optional(),
+      })
+      .optional(),
   })
   .strict();
 

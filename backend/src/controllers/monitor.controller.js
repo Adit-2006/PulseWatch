@@ -9,6 +9,7 @@ import {
   updateMonitorSchema,
   queryMonitorsSchema,
   queryIncidentsSchema,
+  updateAlertsSchema,
   ALLOWED_UPDATE_FIELDS,
 } from '../validators/monitor.validators.js';
 import { validateUrlAgainstSSRF } from '../utils/ssrf.js';
@@ -322,6 +323,101 @@ export const getMonitorIncidents = async (req, res, next) => {
         limit,
         totalPages: Math.ceil(total / limit) || 1,
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/monitors/:id/alerts
+ * Retrieve alert settings for a monitor.
+ */
+export const getMonitorAlerts = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const defaultAlerts = {
+      email: { enabled: false, recipient: null },
+      webhook: { enabled: false, url: null, hmacSecret: null },
+    };
+
+    res.status(200).json({
+      alerts: monitor.alerts || defaultAlerts,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * PATCH / PUT /api/monitors/:id/alerts
+ * Configure alert settings for a monitor.
+ */
+export const updateMonitorAlerts = async (req, res, next) => {
+  try {
+    assertValidObjectId(req.params.id);
+
+    const monitor = await Monitor.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+    });
+
+    if (!monitor) {
+      throw new NotFoundError('Monitor not found');
+    }
+
+    const validatedAlerts = updateAlertsSchema.parse(req.body);
+
+    // SSRF validation if webhook URL is provided
+    if (validatedAlerts.webhook?.url) {
+      await validateUrlAgainstSSRF(validatedAlerts.webhook.url);
+    }
+
+    const existingAlerts = monitor.alerts || {};
+    const newEmail = validatedAlerts.email
+      ? {
+          enabled: validatedAlerts.email.enabled ?? existingAlerts.email?.enabled ?? false,
+          recipient:
+            validatedAlerts.email.recipient !== undefined
+              ? (validatedAlerts.email.recipient || null)
+              : (existingAlerts.email?.recipient ?? null),
+        }
+      : existingAlerts.email || { enabled: false, recipient: null };
+
+    const newWebhook = validatedAlerts.webhook
+      ? {
+          enabled: validatedAlerts.webhook.enabled ?? existingAlerts.webhook?.enabled ?? false,
+          url:
+            validatedAlerts.webhook.url !== undefined
+              ? (validatedAlerts.webhook.url || null)
+              : (existingAlerts.webhook?.url ?? null),
+          hmacSecret:
+            validatedAlerts.webhook.hmacSecret !== undefined
+              ? (validatedAlerts.webhook.hmacSecret || null)
+              : (existingAlerts.webhook?.hmacSecret ?? null),
+        }
+      : existingAlerts.webhook || { enabled: false, url: null, hmacSecret: null };
+
+    monitor.alerts = {
+      email: newEmail,
+      webhook: newWebhook,
+    };
+
+    await monitor.save();
+
+    res.status(200).json({
+      alerts: monitor.alerts,
+      message: 'Alert settings updated successfully',
     });
   } catch (err) {
     next(err);

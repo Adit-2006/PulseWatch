@@ -41,6 +41,19 @@ const alertLogSchema = new mongoose.Schema(
       required: [true, 'Sent-at timestamp is required'],
       default: Date.now,
     },
+    attempts: {
+      type: Number,
+      default: 0,
+      min: [0, 'Attempts cannot be negative'],
+    },
+    attemptHistory: [
+      {
+        attempt: { type: Number, required: true },
+        status: { type: String, enum: ['SENT', 'FAILED'], required: true },
+        errorMessage: { type: String, default: null },
+        attemptedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,
@@ -49,6 +62,12 @@ const alertLogSchema = new mongoose.Schema(
 
 // Index for querying alert history by incident
 alertLogSchema.index({ incidentId: 1, sentAt: -1 });
+
+// Compound unique index: deduplicate alerts so only one alert per (incidentId, type, channel)
+alertLogSchema.index(
+  { incidentId: 1, type: 1, channel: 1 },
+  { unique: true, name: 'unique_alert_per_incident_type_channel' }
+);
 
 const AlertLog = mongoose.model('AlertLog', alertLogSchema);
 

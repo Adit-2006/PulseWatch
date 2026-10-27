@@ -24,6 +24,15 @@ const envSchema = z.object({
   WORKER_POLL_INTERVAL_MS: z.coerce.number().int().positive().default(3000),
   WORKER_CONCURRENCY: z.coerce.number().int().positive().default(5),
   WORKER_LEASE_DURATION_MS: z.coerce.number().int().positive().default(30000),
+  EMAIL_PROVIDER: z.enum(['resend', 'smtp']).default('resend'),
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default('alerts@pulsewatch.dev'),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_SECURE: z.coerce.boolean().default(false),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  WEBHOOK_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
 });
 
 const parseResult = envSchema.safeParse(process.env);
