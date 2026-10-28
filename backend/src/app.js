@@ -24,16 +24,43 @@ export const createApp = () => {
     })
   );
 
-  // 2. Strict CORS policy from environment
-  const allowedOrigins = env.CORS_ORIGIN.split(',').map((origin) => origin.trim());
+  // 2. Strict CORS policy from environment with wildcard and normalization support
+  const rawOrigins = env.CORS_ORIGIN.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  const normalizeOrigin = (url) => {
+    let clean = url.replace(/\/+$/, '');
+    if (clean !== '*' && !clean.startsWith('http://') && !clean.startsWith('https://')) {
+      clean = `https://${clean}`;
+    }
+    return clean;
+  };
+
+  const allowedOrigins = rawOrigins.map(normalizeOrigin);
+
   app.use(
     cors({
       origin: (origin, callback) => {
         // Allow requests with no origin (e.g. mobile apps, curl, server-to-server health probes)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) {
+
+        const cleanIncoming = origin.replace(/\/+$/, '');
+
+        const isAllowed = allowedOrigins.some((allowed) => {
+          if (allowed === '*' || cleanIncoming === allowed) return true;
+          // Support wildcard patterns (e.g. *.vercel.app or https://*.vercel.app)
+          if (allowed.includes('*')) {
+            const regexPattern = '^' + allowed.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+            return new RegExp(regexPattern).test(cleanIncoming);
+          }
+          return false;
+        });
+
+        if (isAllowed) {
           return callback(null, true);
         }
+
         if (env.NODE_ENV !== 'production' && allowedOrigins.includes('*')) {
           return callback(null, true);
         }

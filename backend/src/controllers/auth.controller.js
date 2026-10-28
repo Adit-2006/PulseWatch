@@ -15,7 +15,7 @@ const SALT_ROUNDS = 12;
 const cookieOptions = () => ({
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
-  sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
   maxAge: parseDurationToMs(env.JWT_EXPIRES_IN),
   path: '/',
 });
@@ -116,7 +116,7 @@ export const logout = (_req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 0,
     path: '/',
   });
