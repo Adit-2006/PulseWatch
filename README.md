@@ -15,7 +15,7 @@ PulseWatch monitors critical HTTP/HTTPS endpoints on configurable schedules, tra
 
 - **Live Application**: [https://pulsewatch-frontend.onrender.com](https://pulsewatch-frontend.onrender.com) _(Configure your custom domain / Render deployment)_
 - **API Health Endpoint**: [https://pulsewatch-api.onrender.com/api/health](https://pulsewatch-api.onrender.com/api/health)
-- **Demo Video Walkthrough**: [Watch the 3-Minute Demo Video]((https://docs.google.com/videos/d/1BjlLpMhwHhdKCl7dVP3cpVoJB307q-Mrj_MTRRQPXkM/play?usp=sharing))
+- **Demo Video Walkthrough**: [Watch the 3-Minute Demo Video](https://docs.google.com/videos/d/1BjlLpMhwHhdKCl7dVP3cpVoJB307q-Mrj_MTRRQPXkM/play?usp=sharing)
 
 ---
 
