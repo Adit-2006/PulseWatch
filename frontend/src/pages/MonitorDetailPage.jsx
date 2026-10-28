@@ -265,7 +265,7 @@ export default function MonitorDetailPage() {
               {monitor.url}
             </span>
             <span className="detail-meta-dot">&bull;</span>
-            <StatusBadge status={monitor.status} />
+            <StatusBadge status={monitor.status || checks[0]?.status || 'PENDING'} />
           </div>
 
           {monitor.isPublic && monitor.publicSlug && (
@@ -335,14 +335,20 @@ export default function MonitorDetailPage() {
 
         <div className="card stat-tile">
           <span className="serif-stat-number">
-            {stats?.avgResponseTime !== undefined ? `${stats.avgResponseTime} ms` : '—'}
+            {(stats?.avgResponseTimeMs ?? stats?.avgResponseTime) !== undefined &&
+            (stats?.avgResponseTimeMs ?? stats?.avgResponseTime) !== null
+              ? `${stats.avgResponseTimeMs ?? stats.avgResponseTime} ms`
+              : '—'}
           </span>
           <span className="serif-stat-label">Average latency</span>
         </div>
 
         <div className="card stat-tile">
           <span className="serif-stat-number">
-            {stats?.p95ResponseTime !== undefined ? `${stats.p95ResponseTime} ms` : '—'}
+            {(stats?.p95ResponseTimeMs ?? stats?.p95ResponseTime) !== undefined &&
+            (stats?.p95ResponseTimeMs ?? stats?.p95ResponseTime) !== null
+              ? `${stats.p95ResponseTimeMs ?? stats.p95ResponseTime} ms`
+              : '—'}
           </span>
           <span className="serif-stat-label">p95 latency</span>
         </div>
@@ -426,7 +432,10 @@ export default function MonitorDetailPage() {
                           </td>
                           <td className="font-mono">{c.statusCode || '—'}</td>
                           <td className="font-mono">
-                            {c.responseTime !== undefined ? `${c.responseTime} ms` : '—'}
+                            {(c.responseTimeMs ?? c.responseTime) !== undefined &&
+                            (c.responseTimeMs ?? c.responseTime) !== null
+                              ? `${c.responseTimeMs ?? c.responseTime} ms`
+                              : '—'}
                           </td>
                           <td>{new Date(c.checkedAt).toLocaleTimeString()}</td>
                           <td className="table-details-col">

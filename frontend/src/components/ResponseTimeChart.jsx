@@ -29,11 +29,11 @@ export default function ResponseTimeChart({
       return { points: [], maxVal: 0, minVal: 0, avgOverall: 0 };
     }
 
-    const values = series.map((s) => s.avgResponseTime || 0);
+    const values = series.map((s) => s.avgResponseTimeMs ?? s.avgResponseTime ?? 0);
     const max = Math.max(...values, 40);
     const min = 0;
     const sum = values.reduce((acc, v) => acc + v, 0);
-    const avg = Math.round(sum / values.length);
+    const avg = values.length > 0 ? Math.round(sum / values.length) : 0;
 
     // SVG dimensions
     const width = 800;
@@ -47,18 +47,20 @@ export default function ResponseTimeChart({
     const chartHeight = height - paddingTop - paddingBottom;
 
     const computedPoints = series.map((item, index) => {
+      const respTime = item.avgResponseTimeMs ?? item.avgResponseTime ?? 0;
       const x =
         series.length === 1
           ? paddingLeft + chartWidth / 2
           : paddingLeft + (index / (series.length - 1)) * chartWidth;
-      const normalizedY = (item.avgResponseTime - min) / (max - min || 1);
+      const normalizedY = (respTime - min) / (max - min || 1);
       const y = height - paddingBottom - normalizedY * chartHeight;
 
       return {
         ...item,
         x,
         y,
-        val: item.avgResponseTime,
+        val: respTime,
+        avgResponseTime: respTime,
       };
     });
 
@@ -215,6 +217,33 @@ export default function ResponseTimeChart({
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+
+            {/* When only 1 check has occurred, render an initial reference baseline */}
+            {points.length === 1 && (
+              <g>
+                <line
+                  x1={52}
+                  y1={points[0].y}
+                  x2={776}
+                  y2={points[0].y}
+                  stroke="#1F6F66"
+                  strokeWidth="1.5"
+                  strokeDasharray="4 4"
+                  opacity="0.35"
+                />
+                <text
+                  x={52 + 724 / 2}
+                  y={Math.max(35, points[0].y - 12)}
+                  textAnchor="middle"
+                  fill="#1F6F66"
+                  fontSize="12"
+                  fontFamily="var(--font-sans)"
+                  fontWeight="500"
+                >
+                  Initial probe: {points[0].avgResponseTime} ms (trend curve connects as checks continue)
+                </text>
+              </g>
+            )}
 
             {/* Interactive hover points */}
             {points.map((pt, idx) => (
