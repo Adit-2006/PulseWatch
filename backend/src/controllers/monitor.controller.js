@@ -96,13 +96,59 @@ export const getMonitors = async (req, res, next) => {
     }
 
     const total = await Monitor.countDocuments(filter);
-    const monitors = await Monitor.find(filter)
+    const rawMonitors = await Monitor.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    const monitorIds = rawMonitors.map((m) => m._id);
+
+    // Aggregate recent check results for all returned monitors
+    const recentChecks =
+      monitorIds.length > 0
+        ? await CheckResult.aggregate([
+            { $match: { monitorId: { $in: monitorIds } } },
+            { $sort: { checkedAt: -1 } },
+            {
+              $group: {
+                _id: '$monitorId',
+                latestStatus: { $first: '$status' },
+                lastResponseTime: { $first: '$responseTimeMs' },
+                lastCheckedAt: { $first: '$checkedAt' },
+                recentLatencies: { $push: '$responseTimeMs' },
+              },
+            },
+          ])
+        : [];
+
+    const checksMap = new Map();
+    for (const item of recentChecks) {
+      checksMap.set(item._id.toString(), item);
+    }
+
+    const enrichedMonitors = rawMonitors.map((m) => {
+      const stats = checksMap.get(m._id.toString());
+      let derivedStatus = 'PENDING';
+      if (m.isPaused) {
+        derivedStatus = 'PAUSED';
+      } else if (stats?.latestStatus) {
+        derivedStatus = stats.latestStatus === 'UP' ? 'OPERATIONAL' : 'DOWN';
+      }
+
+      return {
+        ...m,
+        status: derivedStatus,
+        lastResponseTime: stats?.lastResponseTime ?? null,
+        lastCheckedAt: stats?.lastCheckedAt ?? null,
+        recentLatencies: stats?.recentLatencies
+          ? stats.recentLatencies.slice(0, 10).reverse()
+          : [],
+      };
+    });
 
     res.status(200).json({
-      monitors,
+      monitors: enrichedMonitors,
       pagination: {
         total,
         page,
@@ -126,13 +172,31 @@ export const getMonitorById = async (req, res, next) => {
     const monitor = await Monitor.findOne({
       _id: req.params.id,
       userId: req.user._id,
-    });
+    }).lean();
 
     if (!monitor) {
       throw new NotFoundError('Monitor not found');
     }
 
-    res.status(200).json({ monitor });
+    const latestCheck = await CheckResult.findOne({ monitorId: monitor._id })
+      .sort({ checkedAt: -1 })
+      .lean();
+
+    let derivedStatus = 'PENDING';
+    if (monitor.isPaused) {
+      derivedStatus = 'PAUSED';
+    } else if (latestCheck?.status) {
+      derivedStatus = latestCheck.status === 'UP' ? 'OPERATIONAL' : 'DOWN';
+    }
+
+    res.status(200).json({
+      monitor: {
+        ...monitor,
+        status: derivedStatus,
+        lastResponseTime: latestCheck?.responseTimeMs ?? null,
+        lastCheckedAt: latestCheck?.checkedAt ?? null,
+      },
+    });
   } catch (err) {
     next(err);
   }
